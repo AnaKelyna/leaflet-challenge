@@ -1,8 +1,21 @@
-//Your code here
-// Store our API endpoint inside queryUrl
-var queryUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2020-08-15&endtime=" +
+//Including faultlines for the second part of the challenge
+// Store both API endpoints in to URLs 
+var Url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2020-08-15&endtime=" +
     "2020-08-22&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
-var queryGeo = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
+var GeoUrl = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
+
+// Using d3 to read json and create features
+d3.json(Url, function(data) {
+
+    createFeatures(data.features);
+});
+
+d3.json(GeoURL, function(dataGeo) {
+
+    createFeatures2(dataGeo.features);
+});
+
+// Color selection for the eartquake intensity
 
 function getColor(d) {
     return d > 5 ? '#F06B6B' :
@@ -12,16 +25,6 @@ function getColor(d) {
         d > 1 ? '#E1F34D' :
         '#B7F44E';
 };
-// Perform a GET request to the query URL
-d3.json(queryUrl, function(data) {
-
-    createFeatures(data.features);
-});
-
-d3.json(queryGeo, function(dataGeo) {
-
-    createFeatures2(dataGeo.features);
-});
 
 function createFeatures(earthquakeData) {
     // Define a function we want to run once for each feature in the features array
@@ -37,7 +40,6 @@ function createFeatures(earthquakeData) {
         pointToLayer: function(features, latlng) {
             return L.circle(latlng, {
                 radius: features.properties.mag * 20000 + 10000,
-                color: 'black',
                 fillColor: getColor(features.properties.mag),
                 fillOpacity: 0.8,
                 opacity: 0.7,
