@@ -27,14 +27,14 @@ function getColor(d) {
 };
 
 function createFeatures(earthquakeData) {
-    // Define a function we want to run once for each feature in the features array
-    // Give each feature a popup describing the place and time of the earthquake
+    // Create function to read data (place and time of the earthquake) 
+    // and place it into the popup
     function onEachFeature(feature, layer) {
         layer.bindPopup("<h3>" + feature.properties.place +
             "</h3><hr><p>" + new Date(feature.properties.time) + "</p>" + (feature.properties.mag));
     }
-    // Create a GeoJSON layer containing the features array on the earthquakeData object
-    // Run the onEachFeature function once for each piece of data in the array
+    // Make a GeoJson layer with the above function to place the circles
+    // and determine circles graphic characteristics
     var earthquakes = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature,
         pointToLayer: function(features, latlng) {
@@ -43,22 +43,27 @@ function createFeatures(earthquakeData) {
                 fillColor: getColor(features.properties.mag),
                 fillOpacity: 0.8,
                 opacity: 0.7,
-                weight: 1
+                weight: 1,
+                color: ''
             });
         }
     });
-    // Sending our earthquakes layer to the createMap function
+    // Creating map with earthquakes layer
     createMap(earthquakes);
-    //  earthquakes.addLayer(circle); //
 }
 
-function createFeatures2(earthquakeGeo) {
-    var faultLines = L.geoJSON(earthquakeGeo, {
+// Adding the faultlines data with the new endpoint
+
+var faultlines = [];
+
+function createFeatures2(dataGeo) {
+    var geodata = L.geoJSON(dataGeo, {
         pointToLayer: function(features, latlng) {}
     });
-    /* createMap(faultLines); */
+    faultlines = geodata;
 }
-
+// Create a layer control
+// To control layers visualization we include a control feature on the map
 
 var legend = L.control({ position: "bottomright" });
 legend.onAdd = function() {
@@ -77,7 +82,7 @@ legend.onAdd = function() {
 
 function createMap(earthquakes) {
     // Define streetmap and darkmap layers
-    var satellite = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    var Satellite = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
         attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
         tileSize: 512,
         maxZoom: 18,
@@ -104,7 +109,7 @@ function createMap(earthquakes) {
 
     // Define a baseMaps object to hold our base layers
     var baseMaps = {
-        "Satellite": satellite,
+        "Satellite": Satellite,
         "Outdoors": Outdoors,
         "GrayScale": GrayScale
     };
@@ -112,7 +117,7 @@ function createMap(earthquakes) {
     // Create overlay object to hold our overlay layer
     var overlayMaps = {
         Earthquakes: earthquakes,
-        /* Plate:faultLines */
+        Faultlines: faultlines
     };
 
     // Create our map, giving it the streetmap and earthquakes layers to display on load
@@ -121,10 +126,10 @@ function createMap(earthquakes) {
             37.09, -95.71
         ],
         zoom: 5,
-        layers: [satellite, earthquakes /* ,faultLines */ ]
+        layers: [satellite, earthquakes, faultlines]
     });
 
-    // Create a layer control
+
     // Pass in our baseMaps and overlayMaps
     // Add the layer control to the map
     L.control.layers(baseMaps, overlayMaps, {
