@@ -10,7 +10,7 @@ d3.json(Url, function(data) {
     createFeatures(data.features);
 });
 
-d3.json(GeoURL, function(dataGeo) {
+d3.json(GeoUrl, function(dataGeo) {
 
     createFeatures2(dataGeo.features);
 });
@@ -126,7 +126,7 @@ function createMap(earthquakes) {
             37.09, -95.71
         ],
         zoom: 5,
-        layers: [satellite, earthquakes, faultlines]
+        layers: [Satellite, earthquakes, faultlines]
     });
 
 
